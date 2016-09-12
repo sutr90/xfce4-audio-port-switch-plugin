@@ -1,33 +1,13 @@
 #include "cairo.h"
 #include "sample.h"
 
-#define sample_PREFERRED_FONT "Courier New, Courier 10 Pitch, Monospace Bold"
-
-#define sample_cairo_arc_for_flag(cr, x, y, r, a1, a2) \
-    xx = x; yy = y; \
-    cairo_device_to_user (cr, &xx, &yy); \
-    cairo_arc (cr, xx, yy, r, a1, a2);
-
-#define sample_cairo_arc_for_label(cr, x, y, r, a1, a2) xx = x; \
-    yy = y; \
-    cairo_device_to_user (cr, &xx, &yy); \
-    cairo_arc (cr, xx, yy, r, a1, a2);
-
-#define sample_cairo_move_to(cr, x, y) xx = x; \
-    yy = y; \
-    cairo_device_to_user (cr, &xx, &yy); \
-    cairo_move_to (cr, xx, yy);
-
-
 void
 sample_cairo_draw_flag (cairo_t *cr,
                      const gchar *group_name,
-                     gint panel_size,
                      gint actual_width,
                      gint actual_height,
                      gint width,
-                     gint height,
-                     GdkColor fgcolor)
+                     gint height)
 {
     gchar *filename;
     RsvgHandle *handle;

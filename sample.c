@@ -3,6 +3,7 @@
 #endif
 
 #include "sample.h"
+#include "sample_dialog.h"
 #include "cairo.h"
 
 /* prototypes */
@@ -191,5 +192,10 @@ sample_construct(XfcePanelPlugin *plugin) {
     g_signal_connect (G_OBJECT(plugin), "free-data", G_CALLBACK(sample_free), sample);
     g_signal_connect (plugin, "size-changed", G_CALLBACK(xfce_sample_set_size), sample);
     g_signal_connect (plugin, "orientation-changed", G_CALLBACK(xfce_sample_orientation_changed), sample);
+
+    /* show the configure menu item and connect signal */
+    xfce_panel_plugin_menu_show_configure (plugin);
+    g_signal_connect (G_OBJECT (plugin), "configure-plugin",
+                      G_CALLBACK (sample_configure), sample);
 
 }

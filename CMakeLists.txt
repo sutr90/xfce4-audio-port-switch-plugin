@@ -34,7 +34,7 @@ add_definitions(
 
 add_library(${PROJECT_NAME} SHARED
         sample.c
-        cairo.c)
+        cairo.c sample_dialog.c sample_dialog.h)
 
 target_link_libraries(${PROJECT_NAME}
         ${GTK3_LIBRARIES}

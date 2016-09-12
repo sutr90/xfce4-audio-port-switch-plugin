@@ -20,7 +20,7 @@ sample_cairo_draw_flag (cairo_t *cr,
     if (!group_name)
         return;
 
-    filename = g_strconcat (".", group_name, ".svg", NULL);
+    filename = g_strconcat ("/home/jose/Desktop/", group_name, ".svg", NULL);
     handle = rsvg_handle_new_from_file (filename, NULL);
     g_free (filename);
 

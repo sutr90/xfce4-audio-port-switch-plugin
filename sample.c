@@ -41,8 +41,6 @@ sample_new(XfcePanelPlugin *plugin) {
 
     sample->btn = gtk_button_new();
     gtk_button_set_relief(GTK_BUTTON (sample->btn), GTK_RELIEF_NONE);
-    gtk_container_add(GTK_CONTAINER (sample->plugin), sample->btn);
-    xfce_panel_plugin_add_action_widget(sample->plugin, sample->btn);
     gtk_widget_show(sample->btn);
 
     sample->layout_image = gtk_image_new();
@@ -65,6 +63,8 @@ void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
         plg->filename = _("vn");
     }
     plg->state = ~plg->state;
+
+printf("CLICKED");
 }
 
 gboolean
@@ -188,14 +188,14 @@ sample_construct(XfcePanelPlugin *plugin) {
     /* create the plugin */
     sample = sample_new(plugin);
 
+    gtk_container_add(GTK_CONTAINER (sample->plugin), sample->btn);
+    xfce_panel_plugin_add_action_widget(sample->plugin, sample->btn);
     /* connect plugin signals */
     g_signal_connect (G_OBJECT(plugin), "free-data", G_CALLBACK(sample_free), sample);
-    g_signal_connect (plugin, "size-changed", G_CALLBACK(xfce_sample_set_size), sample);
-    g_signal_connect (plugin, "orientation-changed", G_CALLBACK(xfce_sample_orientation_changed), sample);
+    g_signal_connect (G_OBJECT(plugin), "size-changed", G_CALLBACK(xfce_sample_set_size), sample);
+    g_signal_connect (G_OBJECT(plugin), "orientation-changed", G_CALLBACK(xfce_sample_orientation_changed), sample);
 
     /* show the configure menu item and connect signal */
     xfce_panel_plugin_menu_show_configure (plugin);
-    g_signal_connect (G_OBJECT (plugin), "configure-plugin",
-                      G_CALLBACK (sample_configure), sample);
-
+    g_signal_connect (G_OBJECT (plugin), "configure-plugin", G_CALLBACK (sample_configure), sample);
 }

@@ -30,6 +30,28 @@ XFCE_PANEL_PLUGIN_REGISTER (sample_construct);
 
 void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
     SamplePlugin *plg = (SamplePlugin *) data;
+    GError *error = NULL;
+    
+    gchar *command;
+   if(plg->state == 0){
+	   command = g_strconcat ("pactl set-sink-port ", plg->port_speaker, NULL);
+   } else {
+	   command = g_strconcat ("pactl set-sink-port ", plg->port_headphones, NULL);
+   }
+   
+   gboolean result = g_spawn_command_line_async (command, &error);
+	g_free(command);
+    
+    if (G_UNLIKELY (result == FALSE)){
+        GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (plg))),
+        GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Error switching ports: “%s”", error->message);
+		gtk_dialog_run (GTK_DIALOG (dialog));
+		gtk_widget_destroy (dialog);
+		return;
+    }
+    //0 "analog-output;output-amplifier-on"
+    //0 "analog-output;output-amplifier-off"
+    
     if (plg->state == 0) {
         plg->filename = _("so");
     } else {

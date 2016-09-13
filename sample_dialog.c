@@ -7,33 +7,6 @@
 #include "sample.h"
 #include "sample_dialog.h"
 
-
-static void
-sample_configure_response(GtkWidget *dialog,
-                          gint response,
-                          SamplePlugin *sample) {
-    gboolean result;
-
-    if (response == GTK_RESPONSE_HELP) {
-        /* show help */
-        result = g_spawn_command_line_async("exo-open --launch WebBrowser " PLUGIN_WEBSITE, NULL);
-
-        if (G_UNLIKELY (result == FALSE))
-            g_warning (_("Unable to open the following url: %s"), PLUGIN_WEBSITE);
-    }
-    else {
-        /* remove the dialog data from the plugin */
-        g_object_set_data(G_OBJECT (sample->plugin), "dialog", NULL);
-
-        /* unlock the panel menu */
-        xfce_panel_plugin_unblock_menu(sample->plugin);
-
-        /* destroy the properties dialog */
-        gtk_widget_destroy(dialog);
-    }
-}
-
-
 void
 sample_configure(XfcePanelPlugin *plugin,
                  SamplePlugin *sample) {

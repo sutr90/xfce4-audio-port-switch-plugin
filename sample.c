@@ -67,12 +67,9 @@ sample_plugin_layout_image_exposed(GtkWidget *widget,
     const gchar *group_name;
     cairo_t *cr;
     gint actual_hsize, actual_vsize;
-    gint vsize;
 
     actual_hsize = (sample->button_hsize > sample->hsize) ? sample->button_hsize : sample->hsize;
     actual_vsize = (sample->button_vsize > sample->vsize) ? sample->button_vsize : sample->vsize;
-
-    vsize = MIN (sample->vsize, (int) (sample->hsize * 0.75));
 
     group_name = sample->filename;
 
@@ -81,7 +78,7 @@ sample_plugin_layout_image_exposed(GtkWidget *widget,
 
     sample_cairo_draw_flag(cr, group_name,
                            actual_hsize, actual_vsize,
-                           sample->hsize, vsize
+                           sample->hsize, sample->vsize
     );
 
     cairo_destroy(cr);
@@ -121,38 +118,10 @@ sample_plugin_button_size_allocated(GtkWidget *button,
 
 static gboolean
 sample_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint panel_size) {
-    guint nrows;
-
-    nrows = xfce_panel_plugin_get_nrows(sample->plugin);
-    panel_size /= nrows;
-
-    switch (orientation) {
-        case GTK_ORIENTATION_HORIZONTAL:
-            sample->vsize = panel_size;
-            if (nrows > 1) {
-                sample->hsize = sample->vsize;
-            }
-            else {
-                sample->hsize = (int) (1.33 * panel_size);
-            }
-
-            gtk_widget_set_size_request(sample->btn, sample->hsize, sample->vsize);
-            break;
-        case GTK_ORIENTATION_VERTICAL:
-            sample->hsize = panel_size;
-            if (nrows > 1) {
-                sample->vsize = sample->hsize;
-            }
-            else {
-                sample->vsize = (int) (0.75 * panel_size);
-            }
-            if (sample->vsize < 10) sample->vsize = 10;
-            gtk_widget_set_size_request(sample->btn, sample->hsize, sample->vsize);
-            break;
-        default:
-            break;
-    }
-
+    sample->vsize = panel_size;
+	sample->hsize = panel_size;
+    gtk_widget_set_size_request(sample->btn, sample->hsize, sample->vsize);
+            
     sample_refresh_gui(sample);
     return TRUE;
 }

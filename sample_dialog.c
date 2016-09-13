@@ -41,40 +41,36 @@ void
 sample_configure(XfcePanelPlugin *plugin,
                  SamplePlugin *sample) {
     GtkWidget *dialog;
-    GtkWidget *entry1, *entry2;
+    GtkWidget *entry_speaker, *entry_headphones;
     GtkWidget *content_area;
 
-    dialog = gtk_dialog_new();
-    gtk_dialog_add_button(GTK_DIALOG(dialog), "OK", 0);
-    gtk_dialog_add_button(GTK_DIALOG(dialog), "CANCEL", 1);
+dialog = gtk_dialog_new_with_buttons ("Port settings", GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (plugin))),
+                                      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, _("_OK"),
+                                      GTK_RESPONSE_ACCEPT, _("_Cancel"), GTK_RESPONSE_REJECT, NULL);
+                                      
+                                      gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
 
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    entry1 = gtk_entry_new();
-    entry2 = gtk_entry_new();
+    entry_speaker = gtk_entry_new();
+    entry_headphones = gtk_entry_new();
+    
+    gtk_entry_set_text(GTK_ENTRY(entry_speaker), sample->port_speaker);
+	gtk_entry_set_text(GTK_ENTRY(entry_headphones), sample->port_headphones);
 
-    gtk_box_pack_start (GTK_BOX (content_area), gtk_label_new ("One"), TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX (content_area), entry1, TRUE, TRUE, 0);
+    gtk_box_pack_start (GTK_BOX (content_area), gtk_label_new ("Headphones Port"), TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (content_area), entry_headphones, TRUE, TRUE, 0);    
 
-    gtk_box_pack_start(GTK_BOX (content_area), gtk_label_new ("Two"), TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX (content_area), entry2, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (content_area), gtk_label_new ("Speakers Port"), TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (content_area), entry_speaker, TRUE, TRUE, 0);
+
 
     gtk_widget_show_all(dialog);
     gint result = gtk_dialog_run(GTK_DIALOG(dialog));
 
-    const gchar* entry_line = ""; // variable for entered text
-
-    switch(result)
-    {
-        case 0:
-            entry_line = gtk_entry_get_text(GTK_ENTRY(entry1));
-            break;
-
-        case 1:
-            printf("CANCEL was clicked\n");
-            break;
-        default:
-            printf("Undefined. Perhaps dialog was closed\n");
-    }
+    if(result == GTK_RESPONSE_ACCEPT){
+		sample->port_speaker = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry_speaker)));
+		sample->port_headphones = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry_headphones)));
+	}
 
     gtk_widget_destroy(dialog);
 

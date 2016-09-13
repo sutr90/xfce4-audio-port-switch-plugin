@@ -23,6 +23,10 @@ typedef struct
     gint button_vsize;            /* read allocated button size - see below */
     gchar* filename;
     gint state;
+    
+    /* data */
+    gchar *port_speaker;
+    gchar *port_headphones;
 }
 SamplePlugin;
 

@@ -38,6 +38,10 @@ sample_new(XfcePanelPlugin *plugin) {
     sample->plugin = plugin;
     sample->state = 0;
     sample->filename = _("vn");
+    sample->port_speaker = NULL;
+    sample->port_headphones = NULL;
+
+/* todo load config from file */
 
     sample->btn = gtk_button_new();
     gtk_button_set_relief(GTK_BUTTON (sample->btn), GTK_RELIEF_NONE);
@@ -63,8 +67,6 @@ void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
         plg->filename = _("vn");
     }
     plg->state = ~plg->state;
-
-printf("CLICKED");
 }
 
 gboolean
@@ -109,6 +111,10 @@ sample_free(XfcePanelPlugin *plugin,
     /* destroy the panel widgets */
     gtk_widget_destroy(sample->layout_image);
     gtk_widget_destroy(sample->btn);
+    
+    /* destroy data */
+    g_free(sample->port_speaker);
+    g_free(sample->port_headphones);
 
     /* free the plugin structure */
     panel_slice_free (SamplePlugin, sample);

@@ -7,9 +7,6 @@
 #include "sample.h"
 #include "sample_dialog.h"
 
-/* the website url */
-#define PLUGIN_WEBSITE "http://goodies.xfce.org/projects/panel-plugins/xfce4-sample-plugin"
-
 
 static void
 sample_configure_response(GtkWidget *dialog,
@@ -63,15 +60,16 @@ dialog = gtk_dialog_new_with_buttons ("Port settings", GTK_WINDOW (gtk_widget_ge
     gtk_box_pack_start(GTK_BOX (content_area), gtk_label_new ("Speakers Port"), TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX (content_area), entry_speaker, TRUE, TRUE, 0);
 
-
-    gtk_widget_show_all(dialog);
+    g_object_set_data (G_OBJECT (plugin), "dialog", dialog);
+    gtk_widget_show_all(dialog);    
     gint result = gtk_dialog_run(GTK_DIALOG(dialog));
 
     if(result == GTK_RESPONSE_ACCEPT){
 		sample->port_speaker = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry_speaker)));
 		sample->port_headphones = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry_headphones)));
 	}
-
+	
+	g_object_set_data (G_OBJECT (sample->plugin), "dialog", NULL);
     gtk_widget_destroy(dialog);
 
 }

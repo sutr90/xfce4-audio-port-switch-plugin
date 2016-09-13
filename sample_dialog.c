@@ -38,6 +38,8 @@ dialog = gtk_dialog_new_with_buttons ("Port settings", GTK_WINDOW (gtk_widget_ge
     gint result = gtk_dialog_run(GTK_DIALOG(dialog));
 
     if(result == GTK_RESPONSE_ACCEPT){
+		g_free(sample->port_speaker);
+		g_free(sample->port_headphones);
 		sample->port_speaker = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry_speaker)));
 		sample->port_headphones = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry_headphones)));
 	}

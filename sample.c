@@ -27,37 +27,6 @@ void sample_refresh_gui(SamplePlugin *sample);
 /* register the plugin */
 XFCE_PANEL_PLUGIN_REGISTER (sample_construct);
 
-static SamplePlugin *
-sample_new(XfcePanelPlugin *plugin) {
-    SamplePlugin *sample;
-
-    /* allocate memory for the plugin structure */
-    sample = panel_slice_new0 (SamplePlugin);
-
-    /* pointer to plugin */
-    sample->plugin = plugin;
-    sample->state = 0;
-    sample->filename = _("vn");
-    sample->port_speaker = NULL;
-    sample->port_headphones = NULL;
-
-/* todo load config from file */
-
-    sample->btn = gtk_button_new();
-    gtk_button_set_relief(GTK_BUTTON (sample->btn), GTK_RELIEF_NONE);
-    gtk_widget_show(sample->btn);
-
-    sample->layout_image = gtk_image_new();
-    gtk_container_add(GTK_CONTAINER (sample->btn), sample->layout_image);
-    g_signal_connect (G_OBJECT(sample->layout_image), "expose-event", G_CALLBACK(sample_plugin_layout_image_exposed),
-                      sample);
-    g_signal_connect (sample->btn, "clicked", G_CALLBACK(sample_plugin_button_clicked), sample);
-    gtk_widget_show(GTK_WIDGET (sample->layout_image));
-
-    sample_refresh_gui(sample);
-
-    return sample;
-}
 
 void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
     SamplePlugin *plg = (SamplePlugin *) data;
@@ -187,6 +156,121 @@ sample_refresh_gui(SamplePlugin *sample) {
     gtk_widget_queue_draw_area(sample->btn, 0, 0, sample->button_hsize, sample->button_vsize);
 }
 
+void
+sample_save (XfcePanelPlugin *plugin,
+             SamplePlugin    *sample)
+{
+  XfceRc *rc;
+  gchar  *file;
+
+  /* get the config file location */
+  file = xfce_panel_plugin_save_location (plugin, TRUE);
+
+  if (G_UNLIKELY (file == NULL))
+    {
+       DBG ("Failed to open config file");
+       return;
+    }
+
+  /* open the config file, read/write */
+  rc = xfce_rc_simple_open (file, FALSE);
+  g_free (file);
+
+  if (G_LIKELY (rc != NULL))
+    {
+      /* save the settings */
+      if (sample->port_speaker)
+        xfce_rc_write_entry    (rc, "port_speaker", sample->port_speaker);
+        
+      if (sample->port_headphones)
+        xfce_rc_write_entry    (rc, "port_headphones", sample->port_headphones);
+        
+      if (sample->filename)
+        xfce_rc_write_entry    (rc, "filename", sample->filename);
+        
+      xfce_rc_write_int_entry(rc, "state", sample->state);
+
+      /* close the rc file */
+      xfce_rc_close (rc);
+    }
+}
+
+static void
+sample_read (SamplePlugin *sample)
+{
+  XfceRc      *rc;
+  gchar       *file;
+  const gchar *value;
+
+  /* get the plugin config file location */
+  file = xfce_panel_plugin_save_location (sample->plugin, TRUE);
+
+  if (G_LIKELY (file != NULL))
+    {
+      /* open the config file, readonly */
+      rc = xfce_rc_simple_open (file, TRUE);
+
+      /* cleanup */
+      g_free (file);
+
+      if (G_LIKELY (rc != NULL))
+        {
+          /* read the settings */
+          value = xfce_rc_read_entry (rc, "port_speaker", "");
+          sample->port_speaker = g_strdup (value);
+          
+          value = xfce_rc_read_entry (rc, "port_headphones", "");
+          sample->port_headphones = g_strdup (value);
+          
+          value = xfce_rc_read_entry (rc, "filename", "vn");
+          sample->filename = g_strdup (value);
+          
+          sample->state = xfce_rc_read_int_entry (rc, "state", 0);
+
+          /* cleanup */
+          xfce_rc_close (rc);
+
+          /* leave the function, everything went well */
+          return;
+        }
+    }
+
+  /* something went wrong, apply default values */
+  DBG ("Applying default settings");
+
+  sample->port_speaker = g_strdup ("");
+   sample->port_headphones = g_strdup ("");
+ }
+ 
+ static SamplePlugin *
+sample_new(XfcePanelPlugin *plugin) {
+    SamplePlugin *sample;
+
+    /* allocate memory for the plugin structure */
+    sample = panel_slice_new0 (SamplePlugin);
+
+    /* pointer to plugin */
+    sample->plugin = plugin;
+    sample_read (sample);
+
+/* todo load config from file */
+
+    sample->btn = gtk_button_new();
+    gtk_button_set_relief(GTK_BUTTON (sample->btn), GTK_RELIEF_NONE);
+    gtk_widget_show(sample->btn);
+
+    sample->layout_image = gtk_image_new();
+    gtk_container_add(GTK_CONTAINER (sample->btn), sample->layout_image);
+    g_signal_connect (G_OBJECT(sample->layout_image), "expose-event", G_CALLBACK(sample_plugin_layout_image_exposed),
+                      sample);
+    g_signal_connect (sample->btn, "clicked", G_CALLBACK(sample_plugin_button_clicked), sample);
+    gtk_widget_show(GTK_WIDGET (sample->layout_image));
+
+    sample_refresh_gui(sample);
+
+    return sample;
+}
+
 static void
 sample_construct(XfcePanelPlugin *plugin) {
     SamplePlugin *sample;
@@ -200,6 +284,7 @@ sample_construct(XfcePanelPlugin *plugin) {
     g_signal_connect (G_OBJECT(plugin), "free-data", G_CALLBACK(sample_free), sample);
     g_signal_connect (G_OBJECT(plugin), "size-changed", G_CALLBACK(xfce_sample_set_size), sample);
     g_signal_connect (G_OBJECT(plugin), "orientation-changed", G_CALLBACK(xfce_sample_orientation_changed), sample);
+    g_signal_connect (G_OBJECT (plugin), "save", G_CALLBACK (sample_save), sample);
 
     /* show the configure menu item and connect signal */
     xfce_panel_plugin_menu_show_configure (plugin);

@@ -253,8 +253,6 @@ sample_new(XfcePanelPlugin *plugin) {
     sample->plugin = plugin;
     sample_read (sample);
 
-/* todo load config from file */
-
     sample->btn = gtk_button_new();
     gtk_button_set_relief(GTK_BUTTON (sample->btn), GTK_RELIEF_NONE);
     gtk_widget_show(sample->btn);

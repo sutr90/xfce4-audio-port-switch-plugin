@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
-set(PROJECT_NAME port-switch)
+set(PROJECT_NAME sample)
 project(${PROJECT_NAME})
 
-set(SOURCE_FILES sample.c cairo.c)
+set(SOURCE_FILES sample.c cairo.c sample_dialog.c)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
@@ -32,9 +33,7 @@ add_definitions(
         ${libxfce4util_CFLAGS_OTHER}
         ${librsvg_CFLAGS_OTHER})
 
-add_library(${PROJECT_NAME} SHARED
-        sample.c
-        cairo.c sample_dialog.c sample_dialog.h)
+add_library(${PROJECT_NAME} SHARED sample.c cairo.c sample_dialog.c)
 
 target_link_libraries(${PROJECT_NAME}
         ${GTK3_LIBRARIES}

@@ -6,4 +6,4 @@ Comment=Sample plugin for the Xfce panel
 Icon=xfce4-sample-plugin
 X-XFCE-Module=sample
 X-XFCE-Internal=false
-X-XFCE-Unique=false
+X-XFCE-Unique=true

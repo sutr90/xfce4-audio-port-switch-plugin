@@ -38,15 +38,29 @@ void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
    } else {
 	   command = g_strconcat ("pactl set-sink-port ", plg->port_headphones, NULL);
    }
+   gint exit_status = 0;
+   gboolean result;// = g_spawn_command_line_async (command, &error);
+   gchar *err_out;
+   result = g_spawn_command_line_sync (command,NULL,&err_out,
+                           &exit_status,
+                           &error);
    
-   gboolean result = g_spawn_command_line_async (command, &error);
 	g_free(command);
     
     if (G_UNLIKELY (result == FALSE)){
         GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (plg))),
-        GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Error switching ports: “%s”", error->message);
+        GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Error executing switch command: “%s”", error->message);
 		gtk_dialog_run (GTK_DIALOG (dialog));
 		gtk_widget_destroy (dialog);
+		return;
+    }
+    
+    if (!g_spawn_check_exit_status (exit_status, &error)){
+        GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (plg))),
+        GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Error switching ports: “%s”", err_out);
+		gtk_dialog_run (GTK_DIALOG (dialog));
+		gtk_widget_destroy (dialog);
+		g_free(err_out);
 		return;
     }
     //0 "analog-output;output-amplifier-on"

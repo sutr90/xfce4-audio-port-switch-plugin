@@ -32,9 +32,6 @@ sample_cairo_draw_flag (cairo_t *cr,
     img_width  = dim.width * scalex;
     img_height = dim.height * scaley;
 
-    DBG ("scale x/y: %.3f/%.3f, dim w/h: %d/%d, scaled w/h: %.1f/%.1f",
-         scalex, scaley, dim.width, dim.height, scalex*dim.width, scaley*dim.height);
-
     layoutx = (actual_width - img_width) / 2;
     layouty = (actual_height - img_height) / 2;
     cairo_translate (cr, layoutx, layouty);
@@ -45,11 +42,6 @@ sample_cairo_draw_flag (cairo_t *cr,
     rsvg_handle_render_cairo (handle, cr);
 
     cairo_restore (cr);
-
-    DBG ("actual width/height: %d/%d; w/h: %d/%d; img w/h: %.1f/%.1f; markers: %d, max markers: %d",
-         actual_width, actual_height, width, height, img_width, img_height,
-         variant_markers_count, max_variant_markers_count);
-    DBG ("layout x/y: %.1f/%.1f", layoutx, layouty);
 
     rsvg_handle_close (handle, NULL);
     g_object_unref (handle);

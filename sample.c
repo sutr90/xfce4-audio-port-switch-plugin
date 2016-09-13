@@ -53,9 +53,9 @@ void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
     //0 "analog-output;output-amplifier-off"
     
     if (plg->state == 0) {
-        plg->filename = _("so");
+        plg->filename = _("speaker");
     } else {
-        plg->filename = _("vn");
+        plg->filename = _("headphones");
     }
     plg->state = ~plg->state;
 }
@@ -125,7 +125,6 @@ sample_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint pa
 
     nrows = xfce_panel_plugin_get_nrows(sample->plugin);
     panel_size /= nrows;
-    TRACE ("calculate_sizes(%p: %d,%d)", sample, panel_size, nrows);
 
     switch (orientation) {
         case GTK_ORIENTATION_HORIZONTAL:
@@ -154,7 +153,6 @@ sample_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint pa
             break;
     }
 
-    DBG ("size requested: h/v (%p: %d/%d)", sample, sample->hsize, sample->vsize);
     sample_refresh_gui(sample);
     return TRUE;
 }
@@ -244,7 +242,7 @@ sample_read (SamplePlugin *sample)
           value = xfce_rc_read_entry (rc, "port_headphones", "");
           sample->port_headphones = g_strdup (value);
           
-          value = xfce_rc_read_entry (rc, "filename", "vn");
+          value = xfce_rc_read_entry (rc, "filename", "speaker");
           sample->filename = g_strdup (value);
           
           sample->state = xfce_rc_read_int_entry (rc, "state", 0);
@@ -256,9 +254,6 @@ sample_read (SamplePlugin *sample)
           return;
         }
     }
-
-  /* something went wrong, apply default values */
-  DBG ("Applying default settings");
 
   sample->port_speaker = g_strdup ("");
    sample->port_headphones = g_strdup ("");

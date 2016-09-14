@@ -1,4 +1,3 @@
-#include <string.h>
 #include <gtk/gtk.h>
 
 #include <libxfce4ui/libxfce4ui.h>

@@ -1,7 +1,3 @@
-#ifdef HAVE_STRING_H
-#include <string.h>
-#endif
-
 #include "aps_plugin.h"
 #include "aps_dialog.h"
 #include "aps_drawing.h"
@@ -10,8 +6,6 @@
 static void aps_construct(XfcePanelPlugin *plugin);
 
 gboolean aps_layout_image_exposed(GtkWidget *widget, GdkEventExpose *event, SamplePlugin *sample);
-
-void aps_button_size_allocated(GtkWidget *button, GtkAllocation *allocation, SamplePlugin *sample);
 
 static gboolean aps_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint panel_size);
 
@@ -106,11 +100,6 @@ static void sample_free(XfcePanelPlugin *plugin, SamplePlugin *sample) {
 
     /* free the plugin structure */
     panel_slice_free (SamplePlugin, sample);
-}
-
-void aps_button_size_allocated(GtkWidget *button, GtkAllocation *allocation, SamplePlugin *sample) {
-    sample->button_hsize = allocation->width;
-    sample->button_vsize = allocation->height;
 }
 
 static gboolean aps_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint panel_size) {

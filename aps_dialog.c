@@ -1,8 +1,5 @@
 #include <gtk/gtk.h>
 
-#include <libxfce4ui/libxfce4ui.h>
-#include <libxfce4panel/xfce-panel-plugin.h>
-
 #include "aps_plugin.h"
 #include "aps_dialog.h"
 

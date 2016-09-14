@@ -1,7 +1,7 @@
 #ifndef PORT_SWITCH_SAMPLE_DIALOG_H
 #define PORT_SWITCH_SAMPLE_DIALOG_H
 
-#include "sample.h"
+#include "aps_plugin.h"
 
 G_BEGIN_DECLS
 

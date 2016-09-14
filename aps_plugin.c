@@ -2,32 +2,29 @@
 #include <string.h>
 #endif
 
-#include "sample.h"
-#include "sample_dialog.h"
-#include "cairo.h"
+#include "aps_plugin.h"
+#include "aps_dialog.h"
+#include "aps_drawing.h"
 
 /* prototypes */
-static void sample_construct(XfcePanelPlugin *plugin);
+static void aps_construct(XfcePanelPlugin *plugin);
 
-gboolean sample_plugin_layout_image_exposed(GtkWidget *widget, GdkEventExpose *event, SamplePlugin *sample);
+gboolean aps_layout_image_exposed(GtkWidget *widget, GdkEventExpose *event, SamplePlugin *sample);
 
-void sample_plugin_button_size_allocated(GtkWidget *button, GtkAllocation *allocation, SamplePlugin *sample);
+void aps_button_size_allocated(GtkWidget *button, GtkAllocation *allocation, SamplePlugin *sample);
 
-static gboolean sample_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint panel_size);
+static gboolean aps_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint panel_size);
 
-static void xfce_sample_orientation_changed(XfcePanelPlugin *plugin, GtkOrientation orientation, SamplePlugin *sample);
+static void aps_orientation_changed(XfcePanelPlugin *plugin, GtkOrientation orientation, SamplePlugin *sample);
 
-static gboolean xfce_sample_set_size(XfcePanelPlugin *plugin, gint size, SamplePlugin *sample);
+static gboolean aps_set_size(XfcePanelPlugin *plugin, gint size, SamplePlugin *sample);
 
-void sample_plugin_button_clicked(GtkButton *btn, gpointer data);
+void aps_button_clicked(GtkButton *btn, gpointer data);
 
-void sample_refresh_gui(SamplePlugin *sample);
-
-/* register the plugin */
-XFCE_PANEL_PLUGIN_REGISTER (sample_construct);
+XFCE_PANEL_PLUGIN_REGISTER (aps_construct);
 
 
-void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
+void aps_button_clicked(GtkButton *btn, gpointer data) {
     SamplePlugin *plg = (SamplePlugin *) data;
     GError *error = NULL;
 
@@ -71,7 +68,7 @@ void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
     plg->state = ~plg->state;
 }
 
-gboolean sample_plugin_layout_image_exposed(GtkWidget *widget, GdkEventExpose *event, SamplePlugin *sample) {
+gboolean aps_layout_image_exposed(GtkWidget *widget, GdkEventExpose *event, SamplePlugin *sample) {
     const gchar *group_name;
     cairo_t *cr;
     gint actual_hsize, actual_vsize;
@@ -111,30 +108,26 @@ static void sample_free(XfcePanelPlugin *plugin, SamplePlugin *sample) {
     panel_slice_free (SamplePlugin, sample);
 }
 
-void sample_plugin_button_size_allocated(GtkWidget *button, GtkAllocation *allocation, SamplePlugin *sample) {
+void aps_button_size_allocated(GtkWidget *button, GtkAllocation *allocation, SamplePlugin *sample) {
     sample->button_hsize = allocation->width;
     sample->button_vsize = allocation->height;
 }
 
-static gboolean sample_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint panel_size) {
+static gboolean aps_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint panel_size) {
     sample->vsize = panel_size;
     sample->hsize = panel_size;
     gtk_widget_set_size_request(sample->btn, sample->hsize, sample->vsize);
 
-    sample_refresh_gui(sample);
+    gtk_widget_queue_draw_area(sample->btn, 0, 0, sample->button_hsize, sample->button_vsize);
     return TRUE;
 }
 
-static void xfce_sample_orientation_changed(XfcePanelPlugin *plugin, GtkOrientation orientation, SamplePlugin *sample) {
-    sample_calculate_sizes(sample, orientation, xfce_panel_plugin_get_size(plugin));
+static void aps_orientation_changed(XfcePanelPlugin *plugin, GtkOrientation orientation, SamplePlugin *sample) {
+    aps_calculate_sizes(sample, orientation, xfce_panel_plugin_get_size(plugin));
 }
 
-static gboolean xfce_sample_set_size(XfcePanelPlugin *plugin, gint size, SamplePlugin *sample) {
-    return sample_calculate_sizes(sample, xfce_panel_plugin_get_orientation(plugin), size);
-}
-
-void sample_refresh_gui(SamplePlugin *sample) {
-    gtk_widget_queue_draw_area(sample->btn, 0, 0, sample->button_hsize, sample->button_vsize);
+static gboolean aps_set_size(XfcePanelPlugin *plugin, gint size, SamplePlugin *sample) {
+    return aps_calculate_sizes(sample, xfce_panel_plugin_get_orientation(plugin), size);
 }
 
 void sample_save(XfcePanelPlugin *plugin, SamplePlugin *sample) {
@@ -213,16 +206,16 @@ static SamplePlugin *sample_new(XfcePanelPlugin *plugin) {
 
     sample->layout_image = gtk_image_new();
     gtk_container_add(GTK_CONTAINER (sample->btn), sample->layout_image);
-    g_signal_connect (G_OBJECT(sample->layout_image), "expose-event", G_CALLBACK(sample_plugin_layout_image_exposed), sample);
-    g_signal_connect (sample->btn, "clicked", G_CALLBACK(sample_plugin_button_clicked), sample);
+    g_signal_connect (G_OBJECT(sample->layout_image), "expose-event", G_CALLBACK(aps_layout_image_exposed), sample);
+    g_signal_connect (sample->btn, "clicked", G_CALLBACK(aps_button_clicked), sample);
 
     gtk_widget_show(GTK_WIDGET (sample->layout_image));
-    sample_refresh_gui(sample);
+    gtk_widget_queue_draw_area(sample->btn, 0, 0, sample->button_hsize, sample->button_vsize);
 
     return sample;
 }
 
-static void sample_construct(XfcePanelPlugin *plugin) {
+static void aps_construct(XfcePanelPlugin *plugin) {
     SamplePlugin *sample;
 
     /* create the plugin */
@@ -232,8 +225,8 @@ static void sample_construct(XfcePanelPlugin *plugin) {
     xfce_panel_plugin_add_action_widget(sample->plugin, sample->btn);
     /* connect plugin signals */
     g_signal_connect (G_OBJECT(plugin), "free-data", G_CALLBACK(sample_free), sample);
-    g_signal_connect (G_OBJECT(plugin), "size-changed", G_CALLBACK(xfce_sample_set_size), sample);
-    g_signal_connect (G_OBJECT(plugin), "orientation-changed", G_CALLBACK(xfce_sample_orientation_changed), sample);
+    g_signal_connect (G_OBJECT(plugin), "size-changed", G_CALLBACK(aps_set_size), sample);
+    g_signal_connect (G_OBJECT(plugin), "orientation-changed", G_CALLBACK(aps_orientation_changed), sample);
     g_signal_connect (G_OBJECT(plugin), "save", G_CALLBACK(sample_save), sample);
 
     /* show the configure menu item and connect signal */

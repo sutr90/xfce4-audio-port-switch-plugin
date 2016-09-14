@@ -1,5 +1,5 @@
-#include "cairo.h"
-#include "sample.h"
+#include "aps_drawing.h"
+#include "aps_plugin.h"
 
 void
 sample_cairo_draw_flag(cairo_t *cr, const gchar *group_name, gint actual_width, gint actual_height, gint width, gint height) {

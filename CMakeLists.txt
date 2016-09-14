@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 set(PROJECT_NAME sample)
 project(${PROJECT_NAME})
 
-set(SOURCE_FILES sample.c cairo.c sample_dialog.c)
+set(SOURCE_FILES aps_plugin.c aps_drawing.c aps_dialog.c)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(PkgConfig REQUIRED)
@@ -33,7 +33,7 @@ add_definitions(
         ${libxfce4util_CFLAGS_OTHER}
         ${librsvg_CFLAGS_OTHER})
 
-add_library(${PROJECT_NAME} SHARED sample.c cairo.c sample_dialog.c)
+add_library(${PROJECT_NAME} SHARED aps_plugin.c aps_drawing.c aps_dialog.c)
 
 target_link_libraries(${PROJECT_NAME}
         ${GTK3_LIBRARIES}

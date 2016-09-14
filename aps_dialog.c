@@ -3,8 +3,8 @@
 #include <libxfce4ui/libxfce4ui.h>
 #include <libxfce4panel/xfce-panel-plugin.h>
 
-#include "sample.h"
-#include "sample_dialog.h"
+#include "aps_plugin.h"
+#include "aps_dialog.h"
 
 void sample_configure(XfcePanelPlugin *plugin, SamplePlugin *sample) {
     GtkWidget *dialog;

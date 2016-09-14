@@ -6,7 +6,7 @@
 #include "aps_plugin.h"
 #include "aps_dialog.h"
 
-void sample_configure(XfcePanelPlugin *plugin, SamplePlugin *sample) {
+void aps_show_config(XfcePanelPlugin *plugin, SamplePlugin *sample) {
     GtkWidget *dialog;
     GtkWidget *entry_speaker, *entry_headphones;
     GtkWidget *content_area;

@@ -80,7 +80,7 @@ gboolean aps_layout_image_exposed(GtkWidget *widget, GdkEventExpose *event, Samp
 
     cr = gdk_cairo_create(gtk_widget_get_window((GTK_WIDGET (sample->layout_image))));
 
-    sample_cairo_draw_flag(cr, group_name, actual_hsize, actual_vsize, sample->hsize, sample->vsize);
+    aps_draw_icon(cr, group_name, actual_hsize, actual_vsize, sample->hsize, sample->vsize);
 
     cairo_destroy(cr);
 
@@ -231,5 +231,5 @@ static void aps_construct(XfcePanelPlugin *plugin) {
 
     /* show the configure menu item and connect signal */
     xfce_panel_plugin_menu_show_configure(plugin);
-    g_signal_connect (G_OBJECT(plugin), "configure-plugin", G_CALLBACK(sample_configure), sample);
+    g_signal_connect (G_OBJECT(plugin), "configure-plugin", G_CALLBACK(aps_show_config), sample);
 }

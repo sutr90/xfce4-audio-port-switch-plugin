@@ -6,18 +6,16 @@
 #include "sample.h"
 #include "sample_dialog.h"
 
-void
-sample_configure(XfcePanelPlugin *plugin,
-                 SamplePlugin *sample) {
+void sample_configure(XfcePanelPlugin *plugin, SamplePlugin *sample) {
     GtkWidget *dialog;
     GtkWidget *entry_speaker, *entry_headphones;
     GtkWidget *content_area;
 
-dialog = gtk_dialog_new_with_buttons ("Port settings", GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (plugin))),
+    dialog = gtk_dialog_new_with_buttons ("Port settings", GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (plugin))),
                                       GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, _("_OK"),
                                       GTK_RESPONSE_ACCEPT, _("_Cancel"), GTK_RESPONSE_REJECT, NULL);
                                       
-                                      gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
+    gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
 
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     entry_speaker = gtk_entry_new();
@@ -45,5 +43,4 @@ dialog = gtk_dialog_new_with_buttons ("Port settings", GTK_WINDOW (gtk_widget_ge
 	
 	g_object_set_data (G_OBJECT (sample->plugin), "dialog", NULL);
     gtk_widget_destroy(dialog);
-
 }

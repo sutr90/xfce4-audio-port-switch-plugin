@@ -7,8 +7,7 @@
 #include "cairo.h"
 
 /* prototypes */
-static void
-sample_construct(XfcePanelPlugin *plugin);
+static void sample_construct(XfcePanelPlugin *plugin);
 
 gboolean sample_plugin_layout_image_exposed(GtkWidget *widget, GdkEventExpose *event, SamplePlugin *sample);
 
@@ -39,11 +38,9 @@ void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
         command = g_strconcat("pactl set-sink-port ", plg->port_headphones, NULL);
     }
     gint exit_status = 0;
-    gboolean result;// = g_spawn_command_line_async (command, &error);
+    gboolean result;
     gchar *err_out;
-    result = g_spawn_command_line_sync(command, NULL, &err_out,
-                                       &exit_status,
-                                       &error);
+    result = g_spawn_command_line_sync(command, NULL, &err_out, &exit_status, &error);
 
     g_free(command);
 
@@ -65,8 +62,6 @@ void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
         g_free(err_out);
         return;
     }
-    //0 "analog-output;output-amplifier-on"
-    //0 "analog-output;output-amplifier-off"
 
     if (plg->state == 0) {
         plg->filename = _("speaker");
@@ -76,10 +71,7 @@ void sample_plugin_button_clicked(GtkButton *btn, gpointer data) {
     plg->state = ~plg->state;
 }
 
-gboolean
-sample_plugin_layout_image_exposed(GtkWidget *widget,
-                                   GdkEventExpose *event,
-                                   SamplePlugin *sample) {
+gboolean sample_plugin_layout_image_exposed(GtkWidget *widget, GdkEventExpose *event, SamplePlugin *sample) {
     const gchar *group_name;
     cairo_t *cr;
     gint actual_hsize, actual_vsize;
@@ -91,26 +83,21 @@ sample_plugin_layout_image_exposed(GtkWidget *widget,
 
     cr = gdk_cairo_create(gtk_widget_get_window((GTK_WIDGET (sample->layout_image))));
 
-
-    sample_cairo_draw_flag(cr, group_name,
-                           actual_hsize, actual_vsize,
-                           sample->hsize, sample->vsize
-    );
+    sample_cairo_draw_flag(cr, group_name, actual_hsize, actual_vsize, sample->hsize, sample->vsize);
 
     cairo_destroy(cr);
 
     return FALSE;
 }
 
-static void
-sample_free(XfcePanelPlugin *plugin,
-            SamplePlugin *sample) {
+static void sample_free(XfcePanelPlugin *plugin, SamplePlugin *sample) {
     GtkWidget *dialog;
 
     /* check if the dialog is still open. if so, destroy it */
     dialog = g_object_get_data(G_OBJECT (plugin), "dialog");
-    if (G_UNLIKELY (dialog != NULL))
+    if (G_UNLIKELY (dialog != NULL)) {
         gtk_widget_destroy(dialog);
+    }
 
     /* destroy the panel widgets */
     gtk_widget_destroy(sample->layout_image);
@@ -124,16 +111,12 @@ sample_free(XfcePanelPlugin *plugin,
     panel_slice_free (SamplePlugin, sample);
 }
 
-void
-sample_plugin_button_size_allocated(GtkWidget *button,
-                                    GtkAllocation *allocation,
-                                    SamplePlugin *sample) {
+void sample_plugin_button_size_allocated(GtkWidget *button, GtkAllocation *allocation, SamplePlugin *sample) {
     sample->button_hsize = allocation->width;
     sample->button_vsize = allocation->height;
 }
 
-static gboolean
-sample_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint panel_size) {
+static gboolean sample_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint panel_size) {
     sample->vsize = panel_size;
     sample->hsize = panel_size;
     gtk_widget_set_size_request(sample->btn, sample->hsize, sample->vsize);
@@ -142,32 +125,22 @@ sample_calculate_sizes(SamplePlugin *sample, GtkOrientation orientation, gint pa
     return TRUE;
 }
 
-static void
-xfce_sample_orientation_changed(XfcePanelPlugin *plugin,
-                                GtkOrientation orientation,
-                                SamplePlugin *sample) {
+static void xfce_sample_orientation_changed(XfcePanelPlugin *plugin, GtkOrientation orientation, SamplePlugin *sample) {
     sample_calculate_sizes(sample, orientation, xfce_panel_plugin_get_size(plugin));
 }
 
-static gboolean
-xfce_sample_set_size(XfcePanelPlugin *plugin, gint size,
-                     SamplePlugin *sample) {
+static gboolean xfce_sample_set_size(XfcePanelPlugin *plugin, gint size, SamplePlugin *sample) {
     return sample_calculate_sizes(sample, xfce_panel_plugin_get_orientation(plugin), size);
 }
 
-void
-sample_refresh_gui(SamplePlugin *sample) {
-    /* Part of the image may remain visible after display type change */
+void sample_refresh_gui(SamplePlugin *sample) {
     gtk_widget_queue_draw_area(sample->btn, 0, 0, sample->button_hsize, sample->button_vsize);
 }
 
-void
-sample_save(XfcePanelPlugin *plugin,
-            SamplePlugin *sample) {
+void sample_save(XfcePanelPlugin *plugin, SamplePlugin *sample) {
     XfceRc *rc;
     gchar *file;
 
-    /* get the config file location */
     file = xfce_panel_plugin_save_location(plugin, TRUE);
 
     if (G_UNLIKELY (file == NULL)) {
@@ -175,12 +148,10 @@ sample_save(XfcePanelPlugin *plugin,
         return;
     }
 
-    /* open the config file, read/write */
     rc = xfce_rc_simple_open(file, FALSE);
     g_free(file);
 
     if (G_LIKELY (rc != NULL)) {
-        /* save the settings */
         if (sample->port_speaker)
             xfce_rc_write_entry(rc, "port_speaker", sample->port_speaker);
 
@@ -192,29 +163,23 @@ sample_save(XfcePanelPlugin *plugin,
 
         xfce_rc_write_int_entry(rc, "state", sample->state);
 
-        /* close the rc file */
         xfce_rc_close(rc);
     }
 }
 
-static void
-sample_read(SamplePlugin *sample) {
+static void sample_read(SamplePlugin *sample) {
     XfceRc *rc;
     gchar *file;
     const gchar *value;
 
-    /* get the plugin config file location */
     file = xfce_panel_plugin_save_location(sample->plugin, TRUE);
 
     if (G_LIKELY (file != NULL)) {
-        /* open the config file, readonly */
         rc = xfce_rc_simple_open(file, TRUE);
 
-        /* cleanup */
         g_free(file);
 
         if (G_LIKELY (rc != NULL)) {
-            /* read the settings */
             value = xfce_rc_read_entry(rc, "port_speaker", "");
             sample->port_speaker = g_strdup(value);
 
@@ -226,10 +191,7 @@ sample_read(SamplePlugin *sample) {
 
             sample->state = xfce_rc_read_int_entry(rc, "state", 0);
 
-            /* cleanup */
             xfce_rc_close(rc);
-
-            /* leave the function, everything went well */
             return;
         }
     }
@@ -238,14 +200,10 @@ sample_read(SamplePlugin *sample) {
     sample->port_headphones = g_strdup("");
 }
 
-static SamplePlugin *
-sample_new(XfcePanelPlugin *plugin) {
+static SamplePlugin *sample_new(XfcePanelPlugin *plugin) {
     SamplePlugin *sample;
 
-    /* allocate memory for the plugin structure */
     sample = panel_slice_new0 (SamplePlugin);
-
-    /* pointer to plugin */
     sample->plugin = plugin;
     sample_read(sample);
 
@@ -255,18 +213,16 @@ sample_new(XfcePanelPlugin *plugin) {
 
     sample->layout_image = gtk_image_new();
     gtk_container_add(GTK_CONTAINER (sample->btn), sample->layout_image);
-    g_signal_connect (G_OBJECT(sample->layout_image), "expose-event", G_CALLBACK(sample_plugin_layout_image_exposed),
-                      sample);
+    g_signal_connect (G_OBJECT(sample->layout_image), "expose-event", G_CALLBACK(sample_plugin_layout_image_exposed), sample);
     g_signal_connect (sample->btn, "clicked", G_CALLBACK(sample_plugin_button_clicked), sample);
-    gtk_widget_show(GTK_WIDGET (sample->layout_image));
 
+    gtk_widget_show(GTK_WIDGET (sample->layout_image));
     sample_refresh_gui(sample);
 
     return sample;
 }
 
-static void
-sample_construct(XfcePanelPlugin *plugin) {
+static void sample_construct(XfcePanelPlugin *plugin) {
     SamplePlugin *sample;
 
     /* create the plugin */
